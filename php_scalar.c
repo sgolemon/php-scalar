@@ -20,6 +20,28 @@
 
 #include "php_scalar.h"
 
+#if ZEND_MODULE_API_NO > 20131217
+#define ZEND_ENGINE_2_7
+#endif
+#if ZEND_MODULE_API_NO > 20131105
+#define ZEND_ENGINE_2_6
+#endif
+#if ZEND_MODULE_API_NO > 20121211
+#define ZEND_ENGINE_2_5
+#endif
+#if ZEND_MODULE_API_NO > 20100524
+#define ZEND_ENGINE_2_4
+#endif
+#if ZEND_MODULE_API_NO > 20090625
+#define ZEND_ENGINE_2_3
+#endif
+#if ZEND_MODULE_API_NO > 20050922
+#define ZEND_ENGINE_2_2
+#endif
+#if ZEND_MODULE_API_NO > 20050921
+#define ZEND_ENGINE_2_1
+#endif
+
 #define SCALAR_UNKNOWN  0
 #define SCALAR_BOOL     1
 #define SCALAR_INT      2
@@ -50,7 +72,19 @@ inline zend_uchar scalar_get_type(zend_arg_info *info) {
 	return SCALAR_UNKNOWN;
 }
 
+#if defined(ZEND_ENGINE_2_6)
 #define PHP_SCALAR_OPCODE_COUNT 165
+#elif defined(ZEND_ENGINE_2_5)
+#define PHP_SCALAR_OPCODE_COUNT 163
+#elif defined(ZEND_ENGINE_2_4)
+#define PHP_SCALAR_OPCODE_COUNT 158
+#elif defined(ZEND_ENGINE_2_3)
+#define PHP_SCALAR_OPCODE_COUNT 153
+#elif defined(ZEND_ENGINE_2_1)
+#define PHP_SCALAR_OPCODE_COUNT 150
+#else
+# error "Upgrade PHP, damnit"
+#endif
 
 #define PHP_SCALAR_OPHANDLER_COUNT                            ((25 * (PHP_SCALAR_OPCODE_COUNT + 1)) + 1)
 #define PHP_SCALAR_REPLACE_OPCODE(opname)                     { int i; for(i = 5; i < 25; i++) if (php_scalar_opcode_handlers[(opname*25) + i]) php_scalar_opcode_handlers[(opname*25) + i] = php_scalar_op_##opname; }
@@ -145,6 +179,7 @@ static int ZEND_FASTCALL php_scalar_op_ZEND_RECV_INIT(ZEND_OPCODE_HANDLER_ARGS) 
 	return php_scalar_op_ZEND_RECV(ZEND_OPCODE_HANDLER_ARGS_PASSTHRU);
 }
 
+#ifdef ZEND_ENGINE_2_6
 static int ZEND_FASTCALL php_scalar_op_ZEND_RECV_VARIADIC(ZEND_OPCODE_HANDLER_ARGS) {
 	zend_op *opline = execute_data->opline;
 	zend_uint arg_num = opline->op1.num;
@@ -176,6 +211,7 @@ static int ZEND_FASTCALL php_scalar_op_ZEND_RECV_VARIADIC(ZEND_OPCODE_HANDLER_AR
 		return ret;
 	}
 }
+#endif /* ZEND_ENGINE_2_6 */
 
 /* {{{ MINFO */
 static PHP_MINIT_FUNCTION(scalar) {
@@ -185,7 +221,9 @@ static PHP_MINIT_FUNCTION(scalar) {
 
 	PHP_SCALAR_REPLACE_OPCODE(ZEND_RECV);
 	PHP_SCALAR_REPLACE_OPCODE(ZEND_RECV_INIT);
+#ifdef ZEND_ENGINE_2_6
 	PHP_SCALAR_REPLACE_OPCODE(ZEND_RECV_VARIADIC);
+#endif
 
 	return SUCCESS;
 }
