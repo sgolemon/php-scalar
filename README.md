@@ -22,6 +22,6 @@ Types:
   * `resource`
 
 Note that you cannot specify default values for scalar types because the parser doesn't support it.
-This extension was a quick and dirty proof-of-concept.  A prper implementation will require altering
+This extension was a quick and dirty proof-of-concept.  A proper implementation will require altering
 the parser which can't be done from an extension (without stupid amounts of work).
 
