@@ -3,11 +3,13 @@ php-scalar
 
 Scalar type hinting for PHP
 
+```php
   function foo(int $bar) {
     echo "bar is $bar\n";
   }
   foo(123); // works
   foo(4.56); // throws an error
+```
 
 Types:
   * bool
